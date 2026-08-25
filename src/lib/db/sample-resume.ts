@@ -1,7 +1,12 @@
+import { eq } from 'drizzle-orm';
 import { db } from './index';
 import { resumes, resumeSections } from './schema';
 import { isFeishuDriver } from '@/lib/feishu/driver';
 import { feishuResumeRepository } from '@/lib/feishu/repositories/resume.feishu';
+import { batchCreateRecords } from '../feishu/client';
+import { tableId } from '../feishu/tables';
+import { entityToFields } from '../feishu/repositories/mapping';
+import { resumeSectionsFields } from '../feishu/repositories/table-fields';
 
 /**
  * Create a sample resume for a new user so the dashboard isn't empty.
@@ -159,6 +164,9 @@ export async function createSampleResume(userId: string) {
   ];
 
   if (isFeishuDriver()) {
+    const existing = await feishuResumeRepository.findAllByUserId(userId);
+    if (existing.some((r) => r.title === '示例简历 - Sample Resume')) return;
+
     const resume = await feishuResumeRepository.create({
       userId,
       title: '示例简历 - Sample Resume',
@@ -166,17 +174,30 @@ export async function createSampleResume(userId: string) {
       language: 'zh',
     });
     if (!resume) return;
-    for (const section of sections) {
-      await feishuResumeRepository.createSection({
-        resumeId: resume.id,
-        type: section.type,
-        title: section.title,
-        sortOrder: section.sortOrder,
-        content: section.content,
-      });
-    }
+
+    const now = new Date();
+    const sectionFields = sections.map((section) =>
+      entityToFields(
+        {
+          id: crypto.randomUUID(),
+          resumeId: resume.id,
+          type: section.type,
+          title: section.title,
+          sortOrder: section.sortOrder,
+          visible: true,
+          content: section.content,
+          createdAt: now,
+          updatedAt: now,
+        },
+        resumeSectionsFields,
+      ),
+    );
+    await batchCreateRecords(tableId('resumeSections'), sectionFields);
     return;
   }
+
+  const existingRows: { title: string }[] = await db.select().from(resumes).where(eq(resumes.userId, userId));
+  if (existingRows.some((r) => r.title === '示例简历 - Sample Resume')) return;
 
   const resumeId = crypto.randomUUID();
 

@@ -3,6 +3,7 @@ import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { config } from '@/lib/config';
 import { userRepository } from '@/lib/db/repositories/user.repository';
+import { isRateLimited } from '@/lib/rate-limit';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
@@ -15,10 +16,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             email: { label: 'Email', type: 'text' },
             password: { label: 'Password', type: 'password' },
           },
-          async authorize(credentials) {
+          async authorize(credentials, request) {
             const email = credentials?.email as string | undefined;
             const password = credentials?.password as string | undefined;
             if (!email || !password) return null;
+
+            const ip = (request?.headers as any)?.get?.('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+            if (isRateLimited(`login:${ip}`, 30, 60_000)) return null;
 
             const dbUser = await userRepository.findByEmail(email.trim().toLowerCase());
             if (!dbUser) return null;

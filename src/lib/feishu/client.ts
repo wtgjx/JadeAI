@@ -67,14 +67,27 @@ async function request(
   retries = 3,
 ): Promise<any> {
   const token = await getTenantAccessToken(env);
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      Authorization: `Bearer ${token}`,
-      ...(init.headers ?? {}),
-    },
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10_000);
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      ...init,
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        Authorization: `Bearer ${token}`,
+        ...(init.headers ?? {}),
+      },
+      signal: controller.signal,
+    });
+  } catch (e) {
+    clearTimeout(timer);
+    if (e instanceof Error && e.name === 'AbortError') {
+      throw new FeishuApiError(-1, 'request timeout');
+    }
+    throw new FeishuApiError(-1, `network error: ${e instanceof Error ? e.message : String(e)}`);
+  }
+  clearTimeout(timer);
   const data = (await res.json().catch(() => null)) as { code?: number; msg?: string; data?: any } | null;
   if (!data) {
     throw new FeishuApiError(-1, `non-JSON response (HTTP ${res.status}) for ${path}`);

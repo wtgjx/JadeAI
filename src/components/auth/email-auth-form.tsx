@@ -165,7 +165,7 @@ export function EmailAuthForm() {
             <Input
               type="password"
               required
-              minLength={6}
+              minLength={8}
               autoComplete="new-password"
               placeholder={t('passwordPlaceholder')}
               value={password}
