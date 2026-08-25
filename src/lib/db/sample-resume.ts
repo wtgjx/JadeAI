@@ -6,13 +6,13 @@ import { feishuResumeRepository } from '@/lib/feishu/repositories/resume.feishu'
 import { batchCreateRecords } from '../feishu/client';
 import { tableId } from '../feishu/tables';
 import { entityToFields } from '../feishu/repositories/mapping';
-import { resumeSectionsFields } from '../feishu/repositories/table-fields';
+import { resumeSectionsFields, resumesFields } from '../feishu/repositories/table-fields';
 
 /**
  * Create a sample resume for a new user so the dashboard isn't empty.
  * Uses inline data — does not depend on seed or demo-fingerprint user.
  */
-export async function createSampleResume(userId: string) {
+export async function createSampleResume(userId: string, opts?: { assumeNewUser?: boolean }) {
   const sections = [
     {
       type: 'personal_info',
@@ -164,23 +164,33 @@ export async function createSampleResume(userId: string) {
   ];
 
   if (isFeishuDriver()) {
-    const existing = await feishuResumeRepository.findAllByUserId(userId);
-    if (existing.some((r) => r.title === '示例简历 - Sample Resume')) return;
-
-    const resume = await feishuResumeRepository.create({
-      userId,
-      title: '示例简历 - Sample Resume',
-      template: 'modern',
-      language: 'zh',
-    });
-    if (!resume) return;
+    if (!opts?.assumeNewUser) {
+      const existing = await feishuResumeRepository.findAllByUserId(userId);
+      if (existing.some((r) => r.title === '示例简历 - Sample Resume')) return;
+    }
 
     const now = new Date();
+    const resumeId = crypto.randomUUID();
+    await batchCreateRecords(tableId('resumes'), [
+      entityToFields(
+        {
+          id: resumeId,
+          userId,
+          title: '示例简历 - Sample Resume',
+          template: 'modern',
+          language: 'zh',
+          createdAt: now,
+          updatedAt: now,
+        },
+        resumesFields,
+      ),
+    ]);
+
     const sectionFields = sections.map((section) =>
       entityToFields(
         {
           id: crypto.randomUUID(),
-          resumeId: resume.id,
+          resumeId,
           type: section.type,
           title: section.title,
           sortOrder: section.sortOrder,
@@ -196,8 +206,10 @@ export async function createSampleResume(userId: string) {
     return;
   }
 
-  const existingRows: { title: string }[] = await db.select().from(resumes).where(eq(resumes.userId, userId));
-  if (existingRows.some((r) => r.title === '示例简历 - Sample Resume')) return;
+  if (!opts?.assumeNewUser) {
+    const existingRows: { title: string }[] = await db.select().from(resumes).where(eq(resumes.userId, userId));
+    if (existingRows.some((r) => r.title === '示例简历 - Sample Resume')) return;
+  }
 
   const resumeId = crypto.randomUUID();
 

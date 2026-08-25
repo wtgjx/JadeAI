@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     }
 
     try {
-      await createSampleResume(user.id);
+      await createSampleResume(user.id, { assumeNewUser: true });
     } catch (e) {
       console.error('[register] failed to create sample resume:', e);
     }

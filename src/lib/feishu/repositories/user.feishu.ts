@@ -26,10 +26,22 @@ type UserEntity = {
   updatedAt: Date | null;
 };
 
+/**
+ * 单实例内存缓存：resolveUser() 每个 API 请求都会 findById，跨区 RTT ~400ms。
+ * 多实例/多 lambda 间不共享，TTL 过期兜底，可接受短暂陈旧。
+ */
+const USER_CACHE_TTL_MS = 60_000;
+const userCache = new Map<string, { entity: UserEntity; expiresAt: number }>();
+
 export const feishuUserRepository = {
   async findById(id: string): Promise<UserEntity | null> {
+    const cached = userCache.get(id);
+    if (cached && cached.expiresAt > Date.now()) return cached.entity;
     const page = await searchRecords(tableId('users'), [{ field_name: 'id', operator: 'is', value: [id] }], { pageSize: 1 });
-    return page.items[0] ? recordToEntity<UserEntity>(page.items[0], usersFields) : null;
+    const entity = page.items[0] ? recordToEntity<UserEntity>(page.items[0], usersFields) : null;
+    if (entity) userCache.set(id, { entity, expiresAt: Date.now() + USER_CACHE_TTL_MS });
+    else userCache.delete(id);
+    return entity;
   },
 
   async findByEmail(email: string): Promise<UserEntity | null> {
@@ -136,7 +148,19 @@ export const feishuUserRepository = {
         usersFields,
       ),
     ]);
-    return this.findById(id);
+    const entity: UserEntity = {
+      id,
+      email: data.email ?? null,
+      name: data.name ?? '',
+      avatarUrl: data.avatarUrl ?? null,
+      fingerprint: data.fingerprint ?? null,
+      authType: data.authType,
+      passwordHash: data.passwordHash ?? null,
+      createdAt: now,
+      updatedAt: now,
+    };
+    userCache.set(id, { entity, expiresAt: Date.now() + USER_CACHE_TTL_MS });
+    return entity;
   },
 
   async update(id: string, data: Partial<{ name: string; avatarUrl: string }>): Promise<UserEntity | null> {
@@ -144,6 +168,7 @@ export const feishuUserRepository = {
     if (!recordId) return null;
     const fields: Record<string, unknown> = { ...data, updatedAt: new Date() };
     await batchUpdateRecords(tableId('users'), [{ record_id: recordId, fields: entityToFields(fields, usersFields) }]);
+    userCache.delete(id);
     return this.findById(id);
   },
 
@@ -160,6 +185,7 @@ export const feishuUserRepository = {
     await batchUpdateRecords(tableId('users'), [
       { record_id: recordId, fields: entityToFields({ settings: merged, updatedAt: new Date() }, usersFields) },
     ]);
+    userCache.delete(id);
     return merged;
   },
 };
