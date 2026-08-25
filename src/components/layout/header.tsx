@@ -27,8 +27,9 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-background/95 dark:supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
         <div className="flex items-center gap-6">
-          <Link href="/dashboard" className="flex items-center gap-1">
-            <Image src="/logo.svg" alt="JadeAI" width={120} height={36} priority />
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <Image src="/logo.png" alt="职爪" width={32} height={32} priority className="rounded-lg" />
+            <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">职爪</span>
           </Link>
           <nav className="hidden md:flex items-center gap-1">
             {NAV_ITEMS.map((item) => {

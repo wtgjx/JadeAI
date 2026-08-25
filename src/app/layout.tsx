@@ -4,13 +4,13 @@ import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
-const appName = process.env.APP_NAME || 'JadeAI';
+const appName = process.env.APP_NAME || '职爪';
 
 export const metadata: Metadata = {
-  title: `${appName} - AI Resume Builder`,
-  description: 'AI-powered intelligent resume builder with drag-and-drop editor',
+  title: `${appName} - 秋招，从投递到 Offer`,
+  description: '职爪 ZHIZHUA — AI 简历助手，从投递到 Offer 的一站式秋招工具',
   icons: {
-    icon: '/favicon.svg',
+    icon: '/favicon.png',
   },
 };
 

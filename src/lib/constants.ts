@@ -1,4 +1,4 @@
-export const APP_NAME = 'JadeAI';
+export const APP_NAME = '职爪';
 
 export const SECTION_TYPES = [
   'personal_info',

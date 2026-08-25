@@ -10,11 +10,15 @@ export function StartStart() {
     <main className="flex min-h-dvh flex-col items-center justify-center bg-zinc-50 px-4 py-10">
       <div className="w-full max-w-2xl">
         <div className="mb-8 text-center">
-          <div className="mb-3 inline-flex size-12 items-center justify-center rounded-2xl bg-brand text-white shadow-sm">
-            <span className="text-lg font-bold">简</span>
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900">同学简历</h1>
-          <p className="mt-2 text-sm text-zinc-500">一步步带你做出能投的简历</p>
+          <img
+            src="/logo.png"
+            alt="职爪"
+            className="mx-auto mb-3 size-14 rounded-xl object-contain drop-shadow-sm"
+          />
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
+            职爪 <span className="text-base font-semibold text-zinc-400">ZHIZHUA</span>
+          </h1>
+          <p className="mt-2 text-sm text-zinc-500">秋招，从投递到 Offer</p>
         </div>
 
         {/* 两个入口：横向排列 */}

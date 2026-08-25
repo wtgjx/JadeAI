@@ -33,8 +33,9 @@ export default function AuthLayout({
 
       {/* Logo - top left */}
       <div className="absolute left-6 top-6 z-20">
-        <Link href="/" className="transition-opacity hover:opacity-80">
-          <Image src="/logo.svg" alt="JadeAI" width={100} height={30} />
+        <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
+          <Image src="/logo.png" alt="职爪" width={32} height={32} className="rounded-lg" />
+          <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">职爪</span>
         </Link>
       </div>
 
