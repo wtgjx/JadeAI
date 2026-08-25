@@ -171,21 +171,8 @@ export async function createSampleResume(userId: string, opts?: { assumeNewUser?
 
     const now = new Date();
     const resumeId = crypto.randomUUID();
-    await batchCreateRecords(tableId('resumes'), [
-      entityToFields(
-        {
-          id: resumeId,
-          userId,
-          title: '示例简历 - Sample Resume',
-          template: 'modern',
-          language: 'zh',
-          createdAt: now,
-          updatedAt: now,
-        },
-        resumesFields,
-      ),
-    ]);
-
+    // resume 与 sections 并行写入：resume_id 是本地生成的 UUID，飞书 Base 无外键约束，
+    // 两次 batchCreate 无真实依赖；串行会叠加飞书单请求 3~4s 的延迟。
     const sectionFields = sections.map((section) =>
       entityToFields(
         {
@@ -202,7 +189,23 @@ export async function createSampleResume(userId: string, opts?: { assumeNewUser?
         resumeSectionsFields,
       ),
     );
-    await batchCreateRecords(tableId('resumeSections'), sectionFields);
+    await Promise.all([
+      batchCreateRecords(tableId('resumes'), [
+        entityToFields(
+          {
+            id: resumeId,
+            userId,
+            title: '示例简历 - Sample Resume',
+            template: 'modern',
+            language: 'zh',
+            createdAt: now,
+            updatedAt: now,
+          },
+          resumesFields,
+        ),
+      ]),
+      batchCreateRecords(tableId('resumeSections'), sectionFields),
+    ]);
     return;
   }
 
