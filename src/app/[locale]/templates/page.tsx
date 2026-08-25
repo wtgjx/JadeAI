@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ArrowLeft, Eye, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -222,6 +222,50 @@ function buildMockResume(template: string): Resume {
   }) as Resume;
 }
 
+// 模块级预构建：mock 简历只在加载时构建一次，保持引用稳定供 memo 生效
+const MOCK_RESUMES = TEMPLATES.map((template) => ({
+  template,
+  resume: buildMockResume(template),
+}));
+
+// 模板预览懒挂载：滚入视口前只渲染骨架，避免首屏一次性渲染 50 份完整简历（SSR + 水合双重开销）
+const LazyPreview = memo(function LazyPreview({ resume }: { resume: Resume }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  if (!visible) {
+    return (
+      <div ref={ref} className="animate-pulse bg-zinc-100 dark:bg-zinc-800" style={{ width: '794px', height: '1123px' }} />
+    );
+  }
+
+  return (
+    <div ref={ref}>
+      <ResumePreview resume={resume} />
+    </div>
+  );
+});
+
 export default function TemplatesPage() {
   const t = useTranslations();
   const router = useRouter();
@@ -269,8 +313,7 @@ export default function TemplatesPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {TEMPLATES.map((template, idx) => {
-          const mockResume = buildMockResume(template);
+        {MOCK_RESUMES.map(({ template, resume }, idx) => {
           const label = t(templateLabelKeys[template]);
           const isCreating = creatingTemplate === template;
           const isFirst = idx === 0;
@@ -296,7 +339,7 @@ export default function TemplatesPage() {
                     transform: 'translateX(-50%) scale(0.28)',
                   }}
                 >
-                  <ResumePreview resume={mockResume} />
+                  <LazyPreview resume={resume} />
                 </div>
               </div>
 

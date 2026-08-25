@@ -47,3 +47,4 @@ jadeai-data/*
 test
 release/
 .vscode
+.env*

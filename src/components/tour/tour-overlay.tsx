@@ -6,6 +6,8 @@ import { useTranslations } from 'next-intl';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTourStore } from '@/stores/tour-store';
+import { useRouter } from '@/i18n/routing';
+import { warmupApp } from '@/lib/app-warmup';
 
 type Placement = 'top' | 'bottom' | 'left' | 'right';
 
@@ -97,12 +99,21 @@ export function TourOverlay({ tourId, steps }: TourOverlayProps) {
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipSize, setTooltipSize] = useState({ w: 320, h: 160 });
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const warmedRef = useRef(false);
 
   const isMyTour = isActive && activeTourId === tourId;
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // 新手引导期间后台预热：用户看引导的同时，主要路由已在后台加载完成
+  useEffect(() => {
+    if (!isActive || warmedRef.current) return;
+    warmedRef.current = true;
+    warmupApp((href) => router.prefetch(href));
+  }, [isActive, router]);
 
   const updateRect = useCallback(() => {
     if (!isMyTour) return;

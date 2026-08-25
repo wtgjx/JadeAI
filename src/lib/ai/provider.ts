@@ -11,18 +11,20 @@ export interface AIConfig {
 }
 
 export function extractAIConfig(request: NextRequest): AIConfig {
-  const provider = request.headers.get('x-provider') || 'openai';
-  const apiKey = request.headers.get('x-api-key') || '';
-  const baseURL = request.headers.get('x-base-url') || 'https://api.openai.com/v1';
-  const model = request.headers.get('x-model') || 'gpt-4o';
+  // 平台统一配置优先（服务端 .env），前端即使携带 Key 也会被覆盖，用户无需填写
+  const provider = process.env.AI_PROVIDER || request.headers.get('x-provider') || 'openai';
+  const apiKey = process.env.AI_API_KEY || request.headers.get('x-api-key') || '';
+  const baseURL = process.env.AI_BASE_URL || request.headers.get('x-base-url') || 'https://api.openai.com/v1';
+  const model = process.env.AI_MODEL || request.headers.get('x-model') || 'gpt-4o';
   return { provider, apiKey, baseURL, model };
 }
 
 export function getModel(config: AIConfig, modelOverride?: string) {
   if (!config.apiKey) {
-    throw new AIConfigError('API key is required. Please configure it in Settings.');
+    throw new AIConfigError('AI 服务未配置（平台方需在 .env 中设置 AI_API_KEY）。');
   }
-  const modelId = modelOverride || config.model;
+  // 平台已在 .env 配置模型时，忽略客户端覆盖，保证平台统一控制
+  const modelId = process.env.AI_MODEL ? config.model : (modelOverride || config.model);
 
   switch (config.provider) {
     case 'anthropic': {

@@ -15,13 +15,36 @@
     "noData": "No data",
     "rename": "Rename"
   },
+  "bootSplash": {
+    "title": "JadeAI",
+    "videoHint": "Curated autumn recruitment content for you",
+    "videoLink": "Watch now",
+    "loading": "Preparing your workspace...",
+    "close": "Close"
+  },
   "auth": {
     "login": "Log in",
     "logout": "Log out",
     "loginWithGoogle": "Sign in with Google",
     "welcomeBack": "Welcome back",
     "loginDescription": "Sign in to manage your resumes",
-    "agreeTerms": "By signing in, you agree to our Terms of Service and Privacy Policy"
+    "agreeTerms": "By signing in, you agree to our Terms of Service and Privacy Policy",
+    "loginTab": "Log in",
+    "registerTab": "Register",
+    "email": "Email",
+    "password": "Password",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "Enter your password",
+    "namePlaceholder": "Your name (optional)",
+    "loginWithEmail": "Sign in with email",
+    "register": "Register",
+    "loggingIn": "Signing in…",
+    "registering": "Registering…",
+    "registerSuccess": "Registration successful, please sign in",
+    "loginFailed": "Sign-in failed. Check your email and password",
+    "accountExists": "This email is already registered. Please sign in",
+    "invalidEmail": "Please enter a valid email address",
+    "passwordTooShort": "Password must be at least 6 characters"
   },
   "dashboard": {
     "nav": "Dashboard",
@@ -279,7 +302,9 @@
       "baseURL": "Base URL",
       "model": "Default Model",
       "modelPlaceholder": "Enter model name...",
-      "noModelsFound": "No models found. Enter a model name manually below."
+      "noModelsFound": "No models found. Enter a model name manually below.",
+      "platformConfigured": "AI is configured by the platform",
+      "platformConfiguredHint": "No API Key needed — all AI features work out of the box. Contact the admin if something goes wrong."
     },
     "appearance": {
       "title": "Appearance",
@@ -732,11 +757,8 @@
   "linkedinPhoto": {
     "title": "AI LinkedIn Photo",
     "subtitle": "Upload a selfie, generate a professional LinkedIn headshot",
-    "apiKey": "Gemini API Key",
-    "apiKeyPlaceholder": "Enter your Gemini API Key...",
-    "apiKeyHint": "API Key is stored locally in your browser, never uploaded to any server.",
-    "showKey": "Show",
-    "hideKey": "Hide",
+    "platformConfigured": "AI is configured by the platform",
+    "platformConfiguredHint": "No API Key needed. Upload a selfie and generate your headshot. Contact the admin if issues occur.",
     "uploadTitle": "Upload Selfie",
     "uploadHint": "Drag & drop or click to upload. JPG, PNG (max 5MB)",
     "uploadButton": "Choose Photo",
@@ -749,7 +771,7 @@
     "cameraError": "Cannot access camera. Please check permissions.",
     "cameraLoading": "Starting camera...",
     "promptTitle": "Generation Prompt",
-    "promptDefault": "Transform this casual selfie into a polished, corporate-grade LinkedIn headshot.\n\nIdentity preservation: Maintain the subject's exact facial structure, skin tone, eye color, hair color and style, and all distinguishing features — the result must be unmistakably the same person.\n\nLighting: Simulate a three-point studio setup — soft key light at 45° camera-left, gentle fill light camera-right, and a subtle rim/hair light to separate the subject from the background. Avoid harsh shadows or blown-out highlights.\n\nBackground: Clean, slightly out-of-focus neutral gradient (light grey to soft blue-grey). No distracting elements.\n\nComposition: Tight head-and-shoulders crop, subject centered, eyes at upper-third line. Slight 10-15° body angle toward camera-left with face turned back toward camera for a natural editorial feel.\n\nAttire & grooming: Refine clothing to appear neat and professional. Smooth minor skin blemishes while preserving natural skin texture — do not over-retouch.\n\nTechnical quality: Ultra-sharp focus on the eyes, shallow depth of field (f/2.8 equivalent), no chromatic aberration, no noise. Output resolution should match or exceed the input image.\n\nMood: Confident, approachable, and trustworthy — appropriate for senior professional or executive branding.",
+    "promptDefault": "基于参考照片人物进行专业证件照重塑。\n\n## 1. 人物身份保持\n\n必须严格保留参考图中原人物身份特征和辨识度。\n\n保持原人物：\n- 原有脸型\n- 五官比例\n- 眼睛形状与眼距\n- 鼻子形态\n- 嘴唇形态\n- 原有发型轮廓与刘海形状\n- 唇钉等个人标志性特征（如有）\n- 原本年龄感与年轻感\n- 原有性别气质\n\n不得对人物进行重新设计。\n\n不要改变骨相，不要修改成标准模板脸，不要网红脸，不要欧美化，不要韩式精修脸，不要过度瘦脸，不要放大眼睛，不要改变鼻梁，不要改变下巴，不要改变人物性别气质。\n\n最终必须让人一眼认出就是参考照片中的同一个人。\n\n## 2. 照片用途\n\n生成一张适合中国校招/社招/简历/求职网站/企业系统/个人档案/职业社交平台使用的现代职业证件照。\n\n整体风格介于标准中国证件照 × 年轻职场职业头像：正式、可靠、精神，但不要老气。\n\n不是艺术写真，不是生活照，也不是传统影楼精修照。\n\n## 3. 人物姿态\n\n人物正面面对镜头。镜头与人物眼睛保持同一水平高度。头部保持自然端正，可以有极其轻微的自然角度，但不要明显歪头。肩膀自然放松，左右基本平衡。背部自然挺直。颈部舒展，不含胸，不耸肩。视线直接看向镜头。\n\n整体呈现：精神、清醒、自信、年轻、可靠、干净利落。\n\n## 4. 表情\n\n最重要的是自然、自信、有精神。\n\n眼神清醒、稳定、有力量、有自信、有年轻职场人的精神状态。嘴角允许非常轻微自然上扬。可以有极轻微微笑，但不要露齿大笑。不要面无表情。不要严肃冷漠。不要僵硬。不要故意摆职业微笑。\n\n整体感觉像一个状态很好、非常自信、准备参加校招或正式入职的年轻职场人。\n\n## 5. 发型\n\n严格保留参考图中人物的发型特征。\n\n保持原来的发型长度、发型轮廓、刘海（如有）、发尾走向、发色。\n\n仅进行轻微整理，让头发看起来干净、自然、有层次。保留少量自然碎发。\n\n不要改变发型整体样式，不要改变刘海形状，不要把头发修得像假发。\n\n## 6. 服装\n\n保留年轻、现代、有个人风格的商务穿搭。\n\n推荐：深黑色/深炭灰质感西装外套 + 浅色细条纹衬衫 + 深色或棕色低调纹理领带。\n\n服装干净整洁、合身、有质感。西装不要过于宽大。领口和领带保持自然。\n\n整体更接近互联网公司/AI公司/科技公司/创意行业年轻职场人，而不是银行柜员、政府机关或传统商务影楼造型。\n\n## 7. 背景\n\n__BACKGROUND__\n\n## 8. 背景强限制\n\n背景绝对禁止出现：窗户、绿植、办公桌、电脑、书架、画框、家具、咖啡店、办公室、卧室、街道、建筑、灯具、装饰品、文字、Logo、环境元素。\n\n画面必须明确是一张标准干净职业证件照。\n\n## 9. 光线\n\n采用自然、现代的专业证件照布光。\n\n人物正面获得柔和、均匀的光线。面部左右亮度基本平衡，但保留非常轻微自然立体感。鼻梁、眼窝、脸颊和下巴仍然保留真实结构。不要把脸完全打平。\n\n不要出现明显硬阴影，不要明显侧光，不要戏剧性光线，不要强烈轮廓光，不要商业时尚大片布光。\n\n效果像自然光条件很好时拍摄的一张高质量中国职业证件照。\n\n## 10. 皮肤质感\n\n保持真实皮肤。清晰保留毛孔、细微肤质、少量真实皮肤纹理、自然面部高光、正常肤色变化。\n\n允许非常轻微基础修饰，例如减弱临时痘印、明显杂乱小瑕疵。\n\n但是不要磨皮，不要塑料皮肤，不要瓷娃娃皮肤，不要美颜滤镜，不要明显提亮肤色，不要过度白皙，不要改变原本人种和真实肤色。\n\n## 11. 摄影质感\n\n真实摄影。高质量职业证件照摄影。真实相机或高质量手机人像摄影质感。50mm—70mm 等效焦段。自然透视。真实曝光。高清但不过度锐化。自然动态范围。真实头发丝、真实皮肤、真实布料纹理。\n\n不要摄影棚大片感，不要美容院精修感，不要 AI 绘画感，不要 CG 感，不要 3D 渲染感。\n\n## 12. 构图\n\n标准中国求职证件照构图。画幅 __ASPECT_RATIO__。人物位于画面正中央。头部完整出现，头顶保留适量空间。\n\n完整显示头部、颈部、肩膀、上胸区域，画面裁切至胸口附近。人物头部约占画面高度 55%—65%。双眼位于画面上半部分。肩线自然。构图端正。\n\n不要过近的大头照，不要自拍透视，不要广角畸变。\n\n## 13. 最终视觉效果\n\nChinese professional ID portrait, Chinese resume photo, job application portrait, young professional, confident expression, front-facing portrait, modern Chinese corporate portrait, natural skin texture, realistic photography, clean lighting, professional but youthful, confident young creative professional, tech industry professional portrait, minimal retouching, high identity fidelity.\n\n## 14. 强限制\n\n不要改变人物身份，不要改变脸型，不要改变五官，不要改变眼睛，不要改变鼻子，不要改变嘴唇，不要改变发型，不要改变刘海，不要删除唇钉（如有），不要改变年龄感，不要网红脸，不要欧美化，不要韩式美颜，不要过度瘦脸，不要大眼，不要尖下巴，不要假鼻梁，不要夸张微笑，不要生活照，不要办公室背景，不要窗户，不要绿植，不要家具，不要环境场景，不要背景虚化场景，不要摄影棚大片，不要影楼精修感，不要纯商业广告摄影，不要磨皮，不要塑料皮肤，不要 AI 感，不要 CG 感，不要自拍感，不要广角畸变。\n\n最终效果必须首先像一张真实拍摄的中国年轻职场求职证件照，而不是 AI 生成的职业写真。",
     "promptExpand": "Edit Prompt",
     "promptCollapse": "Collapse",
     "requirements": "Additional Requirements",
@@ -769,10 +791,12 @@
     "selectResumePlaceholder": "Select a resume",
     "noResumes": "No resumes",
     "imageSize": "Output Size",
-    "errorNoApiKey": "Please enter your Gemini API Key first",
+    "backgroundLabel": "Background",
+    "backgroundWhite": "White",
+    "backgroundBlue": "Blue",
     "errorNoImage": "Please upload a selfie first",
     "errorGenerate": "Generation failed, please try again",
-    "errorInvalidKey": "Invalid API Key, please check and try again",
+    "errorQuota": "Generation quota exceeded, please contact the admin",
     "errorSafety": "Image did not pass content safety review, please try a different photo",
     "back": "Back to Dashboard"
   },

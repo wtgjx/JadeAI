@@ -322,3 +322,8 @@
   0%, 100% { transform: scaleY(0.4); }
   50% { transform: scaleY(1.2); }
 }
+
+/* BootSplash 首帧隐藏：内联脚本判定无需展示时（新用户/本会话已展示）首帧即隐藏加载页 */
+html[data-splash-hidden] .boot-splash {
+  display: none !important;
+}

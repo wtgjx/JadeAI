@@ -1,10 +1,16 @@
 import { SQLiteAdapter } from './adapters/sqlite';
 import { PostgreSQLAdapter } from './adapters/postgresql';
+import { FeishuAdapter } from './adapters/feishu';
 import { rejectsSqliteOnVercel, resolveDatabaseKind } from './database-kind';
 import { resolveDatabasePath } from './database-path';
+import { isFeishuDriver } from '@/lib/feishu/driver';
 import type { DatabaseAdapter } from './adapter';
 
 function createAdapter(): DatabaseAdapter {
+  if (isFeishuDriver(process.env)) {
+    return new FeishuAdapter();
+  }
+
   if (resolveDatabaseKind(process.env) === 'postgresql') {
     const url = process.env.DATABASE_URL;
     if (!url) {

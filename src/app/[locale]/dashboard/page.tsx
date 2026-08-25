@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus, Search, LayoutGrid, List, Sparkles, Upload, Camera } from 'lucide-react';
+import { Plus, Search, LayoutGrid, List, Sparkles, Upload, Camera, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -144,6 +144,13 @@ export default function DashboardPage() {
         </div>
         <div className="flex items-center gap-2">
           <Button
+            onClick={() => router.push('/start')}
+            className="cursor-pointer gap-2 bg-brand hover:bg-brand-hover"
+          >
+            <Wand2 className="h-4 w-4" />
+            <span className="hidden sm:inline">快速开始</span>
+          </Button>
+          <Button
             variant="outline"
             onClick={() => router.push('/linkedin-photo')}
             className="cursor-pointer gap-2"
@@ -170,8 +177,9 @@ export default function DashboardPage() {
           </Button>
           <Button
             data-tour="dash-create"
+            variant="outline"
             onClick={() => openModal('create-resume')}
-            className="cursor-pointer gap-2 bg-brand hover:bg-brand-hover"
+            className="cursor-pointer gap-2"
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">{t('createResume')}</span>
@@ -258,6 +266,14 @@ export default function DashboardPage() {
       ) : !hasResumes ? (
         <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-zinc-200 dark:border-zinc-700 py-16">
           <p className="text-zinc-500 dark:text-zinc-400">{t('noResumes')}</p>
+          <p className="mt-2 text-sm text-zinc-400">不知道从哪开始？跟着走，10 分钟出一份能投的简历</p>
+          <Button
+            onClick={() => router.push('/start')}
+            className="mt-5 cursor-pointer gap-2 bg-brand hover:bg-brand-hover"
+          >
+            <Wand2 className="h-4 w-4" />
+            快速开始做简历
+          </Button>
         </div>
       ) : !hasResults ? (
         <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-zinc-200 dark:border-zinc-700 py-16">

@@ -15,8 +15,10 @@ import type {
   QuestionEvaluation,
   Recommendation,
 } from '@/types/recruit';
+import { isFeishuDriver } from '@/lib/feishu/driver';
+import { feishuRecruitRepository } from '@/lib/feishu/repositories/recruit.feishu';
 
-export const recruitRepository = {
+const sqliteRecruitRepository = {
   // ── Jobs ────────────────────────────────────────────────────────────────────
 
   async createJob(data: {
@@ -235,3 +237,5 @@ export const recruitRepository = {
     return this.findEvaluation(data.candidateId);
   },
 };
+
+export const recruitRepository = isFeishuDriver() ? feishuRecruitRepository : sqliteRecruitRepository;

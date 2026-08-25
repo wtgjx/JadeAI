@@ -4,8 +4,10 @@ import { users, resumes } from '../schema';
 import { resumeRepository } from './resume.repository';
 import { createSampleResume } from '../sample-resume';
 import { LOCAL_USER_ID, LOCAL_USER_NAME } from '../../auth/local-user';
+import { isFeishuDriver } from '@/lib/feishu/driver';
+import { feishuUserRepository } from '@/lib/feishu/repositories/user.feishu';
 
-export const userRepository = {
+const sqliteUserRepository = {
   async findById(id: string) {
     const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
     return result[0] || null;
@@ -103,7 +105,7 @@ export const userRepository = {
     return created;
   },
 
-  async create(data: { id?: string; email?: string; name?: string; avatarUrl?: string; authType: 'oauth' | 'fingerprint' | 'local'; fingerprint?: string }) {
+  async create(data: { id?: string; email?: string; name?: string; avatarUrl?: string; authType: 'oauth' | 'fingerprint' | 'local' | 'credentials'; fingerprint?: string; passwordHash?: string }) {
     const id = data.id || crypto.randomUUID();
     await db.insert(users).values({ ...data, id });
     return this.findById(id);
@@ -126,3 +128,5 @@ export const userRepository = {
     return merged;
   },
 };
+
+export const userRepository = isFeishuDriver() ? feishuUserRepository : sqliteUserRepository;

@@ -1,7 +1,6 @@
 export const config = {
   auth: {
     enabled: process.env.AUTH_ENABLED === 'true',
-    providers: ['google'] as const,
   },
   runtime: {
     /** True when running inside the Electron desktop shell. */

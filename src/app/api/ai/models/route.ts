@@ -1,9 +1,10 @@
 import { NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  const provider = request.headers.get('x-provider') || 'openai';
-  const apiKey = request.headers.get('x-api-key') || '';
-  const baseURL = request.headers.get('x-base-url') || '';
+  // 平台统一配置优先（服务端 .env），前端无需携带 Key
+  const provider = process.env.AI_PROVIDER || request.headers.get('x-provider') || 'openai';
+  const apiKey = process.env.AI_API_KEY || request.headers.get('x-api-key') || '';
+  const baseURL = process.env.AI_BASE_URL || request.headers.get('x-base-url') || '';
 
   if (!apiKey) {
     return Response.json({ models: [] });

@@ -27,6 +27,11 @@ export default function RootLayout({
             __html: `(function(){try{var b=localStorage.getItem('jadeai-brand');if(b==='boss'){b='mint';localStorage.setItem('jadeai-brand','mint');}else if(b==='jade'){b='blue';localStorage.setItem('jadeai-brand','blue');}if(b==='blue'||b==='pink'){document.documentElement.setAttribute('data-brand',b);}}catch(e){}})();`,
           }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var tourDone=localStorage.getItem('jade_tour_dashboard_completed');var splashDone=sessionStorage.getItem('jade_splash_done');if(!tourDone||splashDone){document.documentElement.setAttribute('data-splash-hidden','');}}catch(e){}})();`,
+          }}
+        />
         {children}
       </body>
     </html>

@@ -1,0 +1,4 @@
+# 禁止将本地环境变量文件上传到 Vercel（含密钥；.env 已被 git 跟踪，仅靠 .gitignore 无法阻止上传）
+.env
+.env.local
+.env.*.local

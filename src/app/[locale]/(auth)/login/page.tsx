@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { LoginButton } from '@/components/auth/login-button';
+import { EmailAuthForm } from '@/components/auth/email-auth-form';
 import { Separator } from '@/components/ui/separator';
 
 export default function LoginPage() {
@@ -31,9 +31,9 @@ export default function LoginPage() {
       {/* Divider */}
       <Separator className="my-6" />
 
-      {/* Login button */}
+      {/* Auth form */}
       <Suspense fallback={null}>
-        <LoginButton />
+        <EmailAuthForm />
       </Suspense>
 
       {/* Terms */}

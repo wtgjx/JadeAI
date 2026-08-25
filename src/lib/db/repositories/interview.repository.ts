@@ -12,8 +12,10 @@ import type {
   ImprovementItem,
   InterviewMessageMetadata,
 } from '@/types/interview';
+import { isFeishuDriver } from '@/lib/feishu/driver';
+import { feishuInterviewRepository } from '@/lib/feishu/repositories/interview.feishu';
 
-export const interviewRepository = {
+const sqliteInterviewRepository = {
   // ── Sessions ────────────────────────────────────────────────────────────────
 
   async createSession(data: {
@@ -184,3 +186,5 @@ export const interviewRepository = {
     return results.filter((r): r is NonNullable<typeof r> => r !== null);
   },
 };
+
+export const interviewRepository = isFeishuDriver() ? feishuInterviewRepository : sqliteInterviewRepository;

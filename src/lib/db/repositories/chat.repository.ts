@@ -1,8 +1,10 @@
 import { eq, desc, and, lt } from 'drizzle-orm';
 import { db } from '../index';
 import { chatSessions, chatMessages } from '../schema';
+import { isFeishuDriver } from '@/lib/feishu/driver';
+import { feishuChatRepository } from '@/lib/feishu/repositories/chat.feishu';
 
-export const chatRepository = {
+const sqliteChatRepository = {
   async findSessionsByResumeId(resumeId: string) {
     return db.select().from(chatSessions).where(eq(chatSessions.resumeId, resumeId)).orderBy(desc(chatSessions.updatedAt));
   },
@@ -85,3 +87,5 @@ export const chatRepository = {
     await db.delete(chatSessions).where(eq(chatSessions.id, sessionId));
   },
 };
+
+export const chatRepository = isFeishuDriver() ? feishuChatRepository : sqliteChatRepository;

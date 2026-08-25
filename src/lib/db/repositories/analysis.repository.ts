@@ -1,8 +1,10 @@
 import { eq, desc } from 'drizzle-orm';
 import { db } from '../index';
 import { jdAnalyses, grammarChecks } from '../schema';
+import { isFeishuDriver } from '@/lib/feishu/driver';
+import { feishuAnalysisRepository } from '@/lib/feishu/repositories/analysis.feishu';
 
-export const analysisRepository = {
+const sqliteAnalysisRepository = {
   // ── JD Analysis ──────────────────────────────────────────
 
   async createJdAnalysis(data: {
@@ -81,3 +83,5 @@ export const analysisRepository = {
     await db.delete(grammarChecks).where(eq(grammarChecks.id, id));
   },
 };
+
+export const analysisRepository = isFeishuDriver() ? feishuAnalysisRepository : sqliteAnalysisRepository;

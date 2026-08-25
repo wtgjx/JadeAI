@@ -1,8 +1,10 @@
 import { eq, desc, sql } from 'drizzle-orm';
 import { db } from '../index';
 import { resumeShares } from '../schema';
+import { isFeishuDriver } from '@/lib/feishu/driver';
+import { feishuShareRepository } from '@/lib/feishu/repositories/share.feishu';
 
-export const shareRepository = {
+const sqliteShareRepository = {
   async findByResumeId(resumeId: string) {
     return db
       .select()
@@ -73,3 +75,5 @@ export const shareRepository = {
       .where(eq(resumeShares.id, id));
   },
 };
+
+export const shareRepository = isFeishuDriver() ? feishuShareRepository : sqliteShareRepository;

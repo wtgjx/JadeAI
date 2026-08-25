@@ -1,8 +1,10 @@
 import { eq, desc, sql } from 'drizzle-orm';
 import { db } from '../index';
 import { resumes, resumeSections } from '../schema';
+import { isFeishuDriver } from '@/lib/feishu/driver';
+import { feishuResumeRepository } from '@/lib/feishu/repositories/resume.feishu';
 
-export const resumeRepository = {
+const sqliteResumeRepository = {
   async findAllByUserId(userId: string) {
     return db.select().from(resumes).where(eq(resumes.userId, userId)).orderBy(desc(resumes.updatedAt));
   },
@@ -109,3 +111,5 @@ export const resumeRepository = {
     }
   },
 };
+
+export const resumeRepository = isFeishuDriver() ? feishuResumeRepository : sqliteResumeRepository;

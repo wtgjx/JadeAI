@@ -21,7 +21,6 @@ import {
   Check,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import {
@@ -36,7 +35,6 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import type { Resume } from '@/types/resume';
 
-const API_KEY_STORAGE_KEY = 'jade_nanobanana_api_key';
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const ASPECT_RATIOS = [
@@ -44,6 +42,7 @@ const ASPECT_RATIOS = [
   { label: '3:4', value: '3:4', desc: 'ID Photo' },
   { label: '2:3', value: '2:3', desc: 'Portrait' },
   { label: '4:3', value: '4:3', desc: 'Landscape' },
+  { label: '16:9', value: '16:9', desc: 'Cinematic' },
 ];
 
 function getHeaders() {
@@ -125,10 +124,6 @@ function resizeDataUrl(
 export default function LinkedInPhotoPage() {
   const t = useTranslations('linkedinPhoto');
 
-  // API Key
-  const [apiKey, setApiKey] = useState('');
-  const [showKey, setShowKey] = useState(false);
-
   // Upload
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -147,7 +142,10 @@ export default function LinkedInPhotoPage() {
   const [requirements, setRequirements] = useState('');
 
   // Aspect ratio
-  const [aspectRatio, setAspectRatio] = useState('1:1');
+  const [aspectRatio, setAspectRatio] = useState('16:9');
+
+  // Background (白底 / 蓝底)
+  const [background, setBackground] = useState<'white' | 'blue'>('white');
 
   // Generation
   const [isGenerating, setIsGenerating] = useState(false);
@@ -157,10 +155,8 @@ export default function LinkedInPhotoPage() {
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [selectedResumeId, setSelectedResumeId] = useState<string>('');
 
-  // Load API key, default prompt, and resume list on mount
+  // Load default prompt and resume list on mount
   useEffect(() => {
-    const stored = localStorage.getItem(API_KEY_STORAGE_KEY);
-    if (stored) setApiKey(stored);
     setPrompt(t('promptDefault'));
 
     // Fetch resume list
@@ -181,12 +177,6 @@ export default function LinkedInPhotoPage() {
       }
     };
   }, []);
-
-  // Persist API key
-  const handleApiKeyChange = (value: string) => {
-    setApiKey(value);
-    localStorage.setItem(API_KEY_STORAGE_KEY, value);
-  };
 
   // File handling
   const handleFile = useCallback(
@@ -298,10 +288,6 @@ export default function LinkedInPhotoPage() {
 
   // Generate
   const handleGenerate = async () => {
-    if (!apiKey.trim()) {
-      toast.error(t('errorNoApiKey'));
-      return;
-    }
     if (!uploadedImage) {
       toast.error(t('errorNoImage'));
       return;
@@ -319,15 +305,17 @@ export default function LinkedInPhotoPage() {
           prompt,
           requirements: requirements.trim(),
           aspectRatio,
-          apiKey: apiKey.trim(),
+          background,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.error === 'invalid_key') {
-          toast.error(t('errorInvalidKey'));
+        if (data.error === 'quota_exceeded') {
+          toast.error(t('errorQuota'));
+        } else if (data.error === 'invalid_key') {
+          toast.error(t('errorGenerate'));
         } else if (data.error === 'safety_filtered') {
           toast.error(t('errorSafety'));
         } else {
@@ -431,34 +419,15 @@ export default function LinkedInPhotoPage() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         {/* Left Column — Settings & Upload */}
         <div className="space-y-6">
-          {/* API Key */}
-          <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <Label className="mb-2 block text-sm font-medium">
-              {t('apiKey')}
-            </Label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Input
-                  type={showKey ? 'text' : 'password'}
-                  value={apiKey}
-                  onChange={(e) => handleApiKeyChange(e.target.value)}
-                  placeholder={t('apiKeyPlaceholder')}
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowKey(!showKey)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-                >
-                  {showKey ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-            <p className="mt-1.5 text-xs text-zinc-400">{t('apiKeyHint')}</p>
+          {/* AI 服务（平台统一配置） */}
+          <div className="flex flex-col items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50/70 p-5 text-center dark:border-emerald-800 dark:bg-emerald-950/30">
+            <Sparkles className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+            <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
+              {t('platformConfigured')}
+            </p>
+            <p className="text-xs leading-relaxed text-emerald-700/80 dark:text-emerald-400/70">
+              {t('platformConfiguredHint')}
+            </p>
           </div>
 
           {/* Image Upload / Camera */}
@@ -641,6 +610,43 @@ export default function LinkedInPhotoPage() {
             </div>
           </div>
 
+          {/* Background (白底 / 蓝底) */}
+          <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <Label className="mb-3 block text-sm font-medium">
+              {t('backgroundLabel')}
+            </Label>
+            <div className="flex gap-2">
+              {(
+                [
+                  { value: 'white', label: t('backgroundWhite') },
+                  { value: 'blue', label: t('backgroundBlue') },
+                ] as const
+              ).map((b) => (
+                <button
+                  key={b.value}
+                  type="button"
+                  onClick={() => setBackground(b.value)}
+                  className={cn(
+                    'flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border px-3 py-2.5 transition-colors',
+                    background === b.value
+                      ? 'border-brand bg-brand-muted text-brand dark:bg-brand-muted dark:text-brand'
+                      : 'border-zinc-200 text-zinc-500 hover:border-zinc-300 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600'
+                  )}
+                >
+                  <span
+                    className={cn(
+                      'h-3.5 w-3.5 rounded-full border',
+                      b.value === 'white'
+                        ? 'border-zinc-300 bg-white'
+                        : 'border-zinc-300 bg-[#438EDB]'
+                    )}
+                  />
+                  <span className="text-sm font-medium">{b.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Prompt */}
           <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
             <div className="flex items-center justify-between">
@@ -685,7 +691,7 @@ export default function LinkedInPhotoPage() {
           {/* Generate Button */}
           <Button
             onClick={handleGenerate}
-            disabled={isGenerating || !apiKey.trim() || !uploadedImage}
+            disabled={isGenerating || !uploadedImage}
             className="w-full cursor-pointer gap-2 bg-brand py-6 text-base font-medium hover:bg-brand-hover disabled:opacity-50"
           >
             {isGenerating ? (

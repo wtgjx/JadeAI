@@ -18,12 +18,12 @@ export function useAuth() {
             name: session.data.user.name,
             email: session.data.user.email,
             avatarUrl: session.data.user.image,
-            authType: 'oauth' as const,
+            authType: 'credentials' as const,
           }
         : null,
       isLoading: session.status === 'loading',
       isAuthenticated: session.status === 'authenticated',
-      signIn: () => signIn('google'),
+      signIn: () => signIn(),
       signOut: () => signOut(),
     };
   }

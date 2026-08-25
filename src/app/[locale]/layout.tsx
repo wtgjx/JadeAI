@@ -8,6 +8,7 @@ import { ThemeProvider } from '@/components/layout/theme-provider';
 import { RuntimeConfigProvider } from '@/components/providers/runtime-config-provider';
 import { BrandProvider } from '@/components/layout/brand-provider';
 import { UpdateNotice } from '@/components/desktop/update-notice';
+import { BootSplash } from '@/components/layout/boot-splash';
 
 export default async function LocaleLayout({
   children,
@@ -39,6 +40,7 @@ export default async function LocaleLayout({
           <BrandProvider>
             <TooltipProvider>
               {children}
+              <BootSplash />
               <Toaster />
               {/* Renders nothing outside the Electron shell. */}
               <UpdateNotice />

@@ -1,21 +1,13 @@
 import { db } from './index';
 import { resumes, resumeSections } from './schema';
+import { isFeishuDriver } from '@/lib/feishu/driver';
+import { feishuResumeRepository } from '@/lib/feishu/repositories/resume.feishu';
 
 /**
  * Create a sample resume for a new user so the dashboard isn't empty.
  * Uses inline data — does not depend on seed or demo-fingerprint user.
  */
 export async function createSampleResume(userId: string) {
-  const resumeId = crypto.randomUUID();
-
-  await db.insert(resumes).values({
-    id: resumeId,
-    userId,
-    title: '示例简历 - Sample Resume',
-    template: 'modern',
-    language: 'zh',
-  });
-
   const sections = [
     {
       type: 'personal_info',
@@ -165,6 +157,36 @@ export async function createSampleResume(userId: string) {
       },
     },
   ];
+
+  if (isFeishuDriver()) {
+    const resume = await feishuResumeRepository.create({
+      userId,
+      title: '示例简历 - Sample Resume',
+      template: 'modern',
+      language: 'zh',
+    });
+    if (!resume) return;
+    for (const section of sections) {
+      await feishuResumeRepository.createSection({
+        resumeId: resume.id,
+        type: section.type,
+        title: section.title,
+        sortOrder: section.sortOrder,
+        content: section.content,
+      });
+    }
+    return;
+  }
+
+  const resumeId = crypto.randomUUID();
+
+  await db.insert(resumes).values({
+    id: resumeId,
+    userId,
+    title: '示例简历 - Sample Resume',
+    template: 'modern',
+    language: 'zh',
+  });
 
   for (const section of sections) {
     await db.insert(resumeSections).values({

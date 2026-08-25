@@ -15,6 +15,7 @@ export const users = pgTable('users', {
   avatarUrl: text('avatar_url'),
   fingerprint: text('fingerprint').unique(),
   authType: text('auth_type').notNull(),
+  passwordHash: text('password_hash'),
   settings: text('settings').default('{}'),
   createdAt: integer('created_at').notNull().default(epochNow),
   updatedAt: integer('updated_at').notNull().default(epochNow),
