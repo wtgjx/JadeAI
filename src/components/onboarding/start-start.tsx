@@ -25,11 +25,11 @@ export function StartStart() {
             onClick={() => router.push('/linkedin-photo')}
             className="group cursor-pointer overflow-hidden rounded-2xl border border-zinc-200 bg-white text-left shadow-sm transition-colors hover:border-brand hover:shadow-md"
           >
-            <div className="aspect-[4/3] w-full overflow-hidden bg-zinc-100">
+            <div className="w-full bg-zinc-50 p-4">
               <img
                 src="/photo-cover.png"
                 alt="证件照"
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                className="mx-auto w-full max-w-full object-contain"
               />
             </div>
             <div className="p-4">
