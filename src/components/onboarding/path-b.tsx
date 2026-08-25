@@ -82,9 +82,8 @@ export function PathBWizard() {
     }
   }
 
-  function stepText() {
-    return step === 'write' ? '第 1 步 / 共 2 步' : '第 2 步 / 共 2 步';
-  }
+  const totalSteps = 2;
+  const currentStep = step === 'write' ? 1 : 2;
 
   return (
     <main className="min-h-dvh bg-zinc-50">
@@ -100,9 +99,19 @@ export function PathBWizard() {
         <div className="mb-5 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-zinc-900">帮我找工作方向</h1>
-            <p className="mt-1 text-sm text-zinc-500">{stepText()} · 不知道做什么？正好，我来帮你想想</p>
+            <p className="mt-1 text-sm text-zinc-500">不知道做什么？正好，我来帮你想想</p>
           </div>
           <span className="rounded-full bg-brand-muted px-3 py-1 text-xs font-medium text-brand">不知道版</span>
+        </div>
+
+        <div className="mb-4">
+          <div className="mb-1.5 flex justify-between text-xs text-zinc-400">
+            <span>第 {currentStep} 步 / 共 {totalSteps} 步</span>
+            <span>{Math.round((currentStep / totalSteps) * 100)}%</span>
+          </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200">
+            <div className="h-full rounded-full bg-brand transition-all duration-300" style={{ width: `${(currentStep / totalSteps) * 100}%` }} />
+          </div>
         </div>
 
         {error ? (

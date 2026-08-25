@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { resolveUser } from '@/lib/auth/helpers';
+import { userRepository } from '@/lib/db/repositories/user.repository';
 
 export const maxDuration = 60;
+
+const PHOTO_LIMIT = 2;
 
 // 火山引擎 doubao-seedream 支持的尺寸（已实测验证）
 const SIZE_MAP: Record<string, string> = {
@@ -21,6 +25,14 @@ const BACKGROUND_MAP: Record<string, string> = {
 
 export async function POST(request: NextRequest) {
   try {
+    const user = await resolveUser();
+    if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+    const settings = await userRepository.getSettings(user.id);
+    const used = Number(settings.photoGenCount) || 0;
+    if (used >= PHOTO_LIMIT) {
+      return NextResponse.json({ error: 'photo_limit_reached' }, { status: 429 });
+    }
+
     const { image, prompt, requirements, aspectRatio, background } =
       await request.json();
 
@@ -150,12 +162,29 @@ export async function POST(request: NextRequest) {
       imgRes.headers.get('content-type')?.split(';')[0] || 'image/jpeg';
     const resultImage = `data:${mimeType};base64,${imgBuf.toString('base64')}`;
 
-    return NextResponse.json({ image: resultImage });
+    await userRepository.updateSettings(user.id, { photoGenCount: used + 1 });
+    return NextResponse.json({
+      image: resultImage,
+      remaining: PHOTO_LIMIT - used - 1,
+    });
   } catch (err) {
     console.error('LinkedIn photo generation error:', err);
     return NextResponse.json(
       { error: 'generate_failed', detail: String(err) },
       { status: 500 }
     );
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const user = await resolveUser();
+    if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+    const settings = await userRepository.getSettings(user.id);
+    const used = Number(settings.photoGenCount) || 0;
+    return NextResponse.json({ limit: PHOTO_LIMIT, used, remaining: Math.max(0, PHOTO_LIMIT - used) });
+  } catch (err) {
+    console.error('linkedin-photo quota error:', err);
+    return NextResponse.json({ error: 'generate_failed' }, { status: 500 });
   }
 }

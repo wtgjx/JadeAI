@@ -150,6 +150,7 @@ export default function LinkedInPhotoPage() {
   // Generation
   const [isGenerating, setIsGenerating] = useState(false);
   const [resultImage, setResultImage] = useState<string | null>(null);
+  const [remaining, setRemaining] = useState<number | null>(null);
 
   // Resume list for avatar
   const [resumes, setResumes] = useState<Resume[]>([]);
@@ -168,6 +169,17 @@ export default function LinkedInPhotoPage() {
       })
       .catch(() => {});
   }, [t]);
+
+  // Fetch remaining photo generation quota on mount
+  useEffect(() => {
+    fetch('/api/linkedin-photo', { method: 'GET' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { remaining?: number } | null) => {
+        if (data && typeof data.remaining === 'number') setRemaining(data.remaining);
+        else setRemaining(0);
+      })
+      .catch(() => setRemaining(0));
+  }, []);
 
   // Cleanup camera stream on unmount
   useEffect(() => {
@@ -312,7 +324,11 @@ export default function LinkedInPhotoPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.error === 'quota_exceeded') {
+        if (data.error === 'photo_limit_reached') {
+          setRemaining(0);
+          toast.error('已用完 2 次免费生成额度');
+          return;
+        } else if (data.error === 'quota_exceeded') {
           toast.error(t('errorQuota'));
         } else if (data.error === 'invalid_key') {
           toast.error(t('errorGenerate'));
@@ -325,6 +341,7 @@ export default function LinkedInPhotoPage() {
       }
 
       setResultImage(data.image);
+      if (typeof data.remaining === 'number') setRemaining(data.remaining);
     } catch {
       toast.error(t('errorGenerate'));
     } finally {
@@ -689,9 +706,16 @@ export default function LinkedInPhotoPage() {
           </div>
 
           {/* Generate Button */}
+          <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-center text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-300">
+            {remaining === null
+              ? '正在读取剩余次数…'
+              : remaining > 0
+                ? `剩余生成次数：${remaining} 次`
+                : '免费生成次数已用完'}
+          </div>
           <Button
             onClick={handleGenerate}
-            disabled={isGenerating || !uploadedImage}
+            disabled={isGenerating || !uploadedImage || remaining === 0}
             className="w-full cursor-pointer gap-2 bg-brand py-6 text-base font-medium hover:bg-brand-hover disabled:opacity-50"
           >
             {isGenerating ? (

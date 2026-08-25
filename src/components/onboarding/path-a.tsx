@@ -99,11 +99,8 @@ export function PathAWizard() {
     }
   }
 
-  function stepText() {
-    if (step === 'jd') return '第 1 步 / 共 3 步';
-    if (step === 'understand') return '第 2 步 / 共 3 步';
-    return '第 3 步 / 共 3 步';
-  }
+  const totalSteps = 3;
+  const currentStep = step === 'jd' ? 1 : step === 'understand' ? 2 : 3;
 
   return (
     <main className="min-h-dvh bg-zinc-50">
@@ -119,9 +116,19 @@ export function PathAWizard() {
         <div className="mb-5 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-zinc-900">我有想去的岗位</h1>
-            <p className="mt-1 text-sm text-zinc-500">{stepText()} · 全程大白话</p>
+            <p className="mt-1 text-sm text-zinc-500">全程大白话</p>
           </div>
           <span className="rounded-full bg-brand-muted px-3 py-1 text-xs font-medium text-brand">按岗位版</span>
+        </div>
+
+        <div className="mb-4">
+          <div className="mb-1.5 flex justify-between text-xs text-zinc-400">
+            <span>第 {currentStep} 步 / 共 {totalSteps} 步</span>
+            <span>{Math.round((currentStep / totalSteps) * 100)}%</span>
+          </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200">
+            <div className="h-full rounded-full bg-brand transition-all duration-300" style={{ width: `${(currentStep / totalSteps) * 100}%` }} />
+          </div>
         </div>
 
         {error ? (
