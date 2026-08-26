@@ -57,7 +57,19 @@ export function StartStart() {
               </div>
             </div>
 
-            <div className="mt-auto space-y-2">
+            {/* 循环动画 */}
+            <div className="mb-3 flex-1 overflow-hidden rounded-xl bg-zinc-50">
+              <video
+                src="/start-animation.mp4"
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="h-full w-full object-cover"
+              />
+            </div>
+
+            <div className="space-y-2">
               <button
                 type="button"
                 onClick={() => router.push('/start/path-a')}
