@@ -1157,6 +1157,9 @@
       "parseFailed": "简历解析失败，请换一份文件或改用粘贴文本"
     }
   },
+  "aptitude": {
+    "nav": "行测"
+  },
   "desktopUpdate": {
     "found": "发现新版本 v{version}",
     "download": "立即下载",

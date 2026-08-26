@@ -1157,6 +1157,9 @@
       "parseFailed": "Could not parse the resume — try another file or paste the text"
     }
   },
+  "aptitude": {
+    "nav": "Aptitude"
+  },
   "desktopUpdate": {
     "found": "Version {version} is available",
     "download": "Download",
