@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { userRepository } from '@/lib/db/repositories/user.repository';
 import { createSampleResume } from '@/lib/db/sample-resume';
 import { isRateLimited } from '@/lib/rate-limit';
+import { verifyCode } from '@/lib/verification-code';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -12,7 +13,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'rate_limited' }, { status: 429 });
   }
 
-  let body: { email?: unknown; password?: unknown; name?: unknown };
+  let body: { email?: unknown; password?: unknown; name?: unknown; code?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -22,9 +23,23 @@ export async function POST(request: Request) {
   const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
   const password = typeof body.password === 'string' ? body.password : '';
   const name = typeof body.name === 'string' && body.name.trim() ? body.name.trim() : undefined;
+  const code = typeof body.code === 'string' ? body.code.trim() : '';
 
   if (!EMAIL_RE.test(email)) {
     return NextResponse.json({ error: 'invalid_email' }, { status: 400 });
+  }
+  if (!code) {
+    return NextResponse.json({ error: 'code_required' }, { status: 400 });
+  }
+  const verifyResult = verifyCode(email, code);
+  if (verifyResult === 'missing') {
+    return NextResponse.json({ error: 'code_required' }, { status: 400 });
+  }
+  if (verifyResult === 'expired') {
+    return NextResponse.json({ error: 'code_expired' }, { status: 400 });
+  }
+  if (verifyResult === 'invalid') {
+    return NextResponse.json({ error: 'invalid_code' }, { status: 400 });
   }
   if (password.length < 8) {
     return NextResponse.json({ error: 'password_too_short' }, { status: 400 });
